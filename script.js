@@ -102,8 +102,8 @@
              welcomePage.style.display = "none"
             photobooth.style.display = "flex"
             console.log("My peer ID is: " + id);
-            invitelink.textContent = `Share this link to invite someone: https://jahyue.github.io/LDRBooth/?room=${id}`;
-            invitelink.href = `https://jahyue.github.io/LDRBooth/?room=${id}`;
+            invitelink.textContent = `Share this link to invite someone: https://jahyue.github.io/Coloroid/?room=${id}`;
+            invitelink.href = `https://jahyue.github.io/Coloroid/?room=${id}`;
         });
         peer.on("connection", (connection) => {
             dataConnection = connection;
