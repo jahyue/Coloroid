@@ -99,6 +99,8 @@
         peer = new Peer(); 
         
         peer.on("open", (id) => {
+             welcomePage.style.display = "none"
+            photobooth.style.display = "flex"
             console.log("My peer ID is: " + id);
             invitelink.textContent = `Share this link to invite someone: https://jahyue.github.io/LDRBooth/?room=${id}`;
             invitelink.href = `https://jahyue.github.io/LDRBooth/?room=${id}`;
@@ -123,8 +125,7 @@
             call.answer(stream);
             call.on("stream", (remoteStream) => {
                 remotecamera.srcObject = remoteStream;
-                welcomePage.style.display = "none"
-                photobooth.style.display = "flex"
+
             });
             call.on("error", (err) => {
                 console.error("Call error:", err);
