@@ -3,6 +3,9 @@
     let remotecamera = document.getElementById("remoteVideo");
     let invitelink = document.getElementById("invitelink");
     let dataConnection = null;
+    let mediaCall = null;
+    let inWelcome = true;
+    let ConnectionStatus = document.getElementById("Status")
     const welcomePage = document.getElementById("welcome")
     const photobooth = document.getElementById("photobooth")
     const createButton = document.getElementById("createButton");
@@ -13,7 +16,26 @@
     const photosDiv = document.getElementById("photos");
     const params = new URLSearchParams(window.location.search);
     const roomID = params.get("room");
-
+    let animationFrameId = null;
+    function GoToWelcome(){
+        if(!inWelcome){
+        welcomePage.style.display = "flex"
+        photobooth.style.display = "none"
+        if (stream){
+        let vids =stream.getTracks();
+        vids.forEach((track) => { track.stop()})
+        
+        stream = null;
+        
+        }
+        localcamera.srcObject = null;
+        remotecamera.srcObject = null;
+        cancelAnimationFrame(animationFrameId)
+        if(dataConnection){dataConnection.close();}
+        if(mediaCall){mediaCall.close()}
+        inWelcome = true;
+    }
+    }
     if (roomID) {
         console.log("guest");
         createButton.style.display = "none";
@@ -25,7 +47,8 @@
         const localcropWidth = localcamera.videoHeight *((camera.width / 2) / camera.height);
         const localcropX = (localcamera.videoWidth - localcropWidth) / 2;
     
-        requestAnimationFrame(drawframe);
+        
+        animationFrameId = requestAnimationFrame(drawframe  );
         if(roomID){
             ctx.drawImage(localcamera, localcropX, 0, localcropWidth, localcamera.videoHeight, camera.width / 2, 0, camera.width / 2, camera.height);
             
@@ -47,7 +70,7 @@
     let stream = null;
     const setupCamera = async () => {
         try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
         localcamera.srcObject = stream;
         await localcamera.play();
         console.log("Camera and microphone access granted.");
@@ -76,16 +99,22 @@
 
     });
     joinButton.addEventListener("click", async () => {
+        inWelcome = false;
         welcomePage.style.display = "none"
         photobooth.style.display = "flex"
         await setupCamera();
         peer = new Peer();
         peer.on("open", (id) => {
             console.log("My peer ID is: " + id);
-            const call = peer.call(roomID, stream);
+            mediaCall = peer.call(roomID, stream);
+            mediaCall.on('close', () => {GoToWelcome()});
             dataConnection = peer.connect(roomID);
             dataConnection.on("open", () => {
+                ConnectionStatus.textContent = "Connected";
                 console.log("Data connection established with host.");
+            });
+            dataConnection.on("close", () =>{
+                GoToWelcome();
             });
             dataConnection.on("data", (data) => {
                     
@@ -96,20 +125,21 @@
         image.src = URL.createObjectURL(blob);
         photosDiv.appendChild(image);
             });
-            call.on("stream", (remoteStream) => {
+            mediaCall.on("stream", (remoteStream) => {
                 remotecamera.srcObject = remoteStream;
             });
-            call.on("error", (err) => {
+            mediaCall.on("error", (err) => {
                 console.error("Call error:", err);
             });
         });
     });
     createButton.addEventListener("click", async () => {
-       
+        inWelcome =false;
         await setupCamera();
         peer = new Peer(); 
         
         peer.on("open", (id) => {
+            
              welcomePage.style.display = "none"
             photobooth.style.display = "flex"
             console.log("My peer ID is: " + id);
@@ -117,9 +147,13 @@
             invitelink.href = `https://jahyue.github.io/Coloroid/?room=${id}`;
         });
         peer.on("connection", (connection) => {
+            ConnectionStatus.textContent = "Connected";
             dataConnection = connection;
             dataConnection.on("open", () => {
                 console.log("Data connection established with guest.");
+            });
+            dataConnection.on("close", () =>{
+                GoToWelcome();
             });
             connection.on("data", (data) => {
             const image = document.createElement("img");
@@ -127,11 +161,15 @@
         photosDiv.appendChild(image);
 
         });
+
         }); 
+
         
         
 
         peer.on("call", (call) => {
+            mediaCall = call
+            mediaCall.on("close", () => {GoToWelcome()});
             console.log("Incoming call from: " + call.peer);
             call.answer(stream);
             call.on("stream", (remoteStream) => {
@@ -141,5 +179,6 @@
             call.on("error", (err) => {
                 console.error("Call error:", err);
             });
+            
         });
     });
