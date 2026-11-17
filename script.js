@@ -27,9 +27,10 @@
     
         requestAnimationFrame(drawframe);
         if(roomID){
-            ctx.drawImage(localcamera, localcropX, 0, localcropWidth, localcamera.videoHeight, 0, 0, camera.width / 2, camera.height);
-        } else{ 
             ctx.drawImage(localcamera, localcropX, 0, localcropWidth, localcamera.videoHeight, camera.width / 2, 0, camera.width / 2, camera.height);
+            
+        } else{ 
+            ctx.drawImage(localcamera, localcropX, 0, localcropWidth, localcamera.videoHeight, 0, 0, camera.width / 2, camera.height);
         }
         
         if (remotecamera.readyState >= 2) {
