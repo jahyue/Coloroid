@@ -26,11 +26,21 @@
         const localcropX = (localcamera.videoWidth - localcropWidth) / 2;
     
         requestAnimationFrame(drawframe);
-        ctx.drawImage(localcamera, localcropX, 0, localcropWidth, localcamera.videoHeight, 0, 0, camera.width / 2, camera.height);
+        if(roomID){
+            ctx.drawImage(localcamera, localcropX, 0, localcropWidth, localcamera.videoHeight, 0, 0, camera.width / 2, camera.height);
+        } else{ 
+            ctx.drawImage(localcamera, localcropX, 0, localcropWidth, localcamera.videoHeight, camera.width / 2, 0, camera.width / 2, camera.height);
+        }
+        
         if (remotecamera.readyState >= 2) {
             const remotecropWidth = remotecamera.videoHeight *((camera.width / 2) / camera.height);
-        const remotecropX = (remotecamera.videoWidth - remotecropWidth) / 2;
+            const remotecropX = (remotecamera.videoWidth - remotecropWidth) / 2;
+            if(roomID){
             ctx.drawImage(remotecamera, remotecropX, 0, remotecropWidth, remotecamera.videoHeight, camera.width / 2, 0, camera.width / 2, camera.height);
+            } else {
+            ctx.drawImage(remotecamera, remotecropX, 0, remotecropWidth, remotecamera.videoHeight, 0, 0, camera.width / 2, camera.height);
+            }
+
         }
     }
     let stream = null;
