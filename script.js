@@ -60,9 +60,10 @@
             const remotecropWidth = remotecamera.videoHeight *((camera.width / 2) / camera.height);
             const remotecropX = (remotecamera.videoWidth - remotecropWidth) / 2;
             if(roomID){
-            ctx.drawImage(remotecamera, remotecropX, 0, remotecropWidth, remotecamera.videoHeight, camera.width / 2, 0, camera.width / 2, camera.height);
+                ctx.drawImage(remotecamera, remotecropX, 0, remotecropWidth, remotecamera.videoHeight, 0, 0, camera.width / 2, camera.height);
+            
             } else {
-            ctx.drawImage(remotecamera, remotecropX, 0, remotecropWidth, remotecamera.videoHeight, 0, 0, camera.width / 2, camera.height);
+            ctx.drawImage(remotecamera, remotecropX, 0, remotecropWidth, remotecamera.videoHeight, camera.width / 2, 0, camera.width / 2, camera.height);
             }
 
         }
