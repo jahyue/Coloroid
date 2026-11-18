@@ -5,6 +5,8 @@
     let dataConnection = null;
     let mediaCall = null;
     let inWelcome = true;
+    let host_ready = false;
+    let guest_ready = false;
     let ConnectionStatus = document.getElementById("Status")
     const welcomePage = document.getElementById("welcome")
     const photobooth = document.getElementById("photobooth")
@@ -17,6 +19,9 @@
     const params = new URLSearchParams(window.location.search);
     const roomID = params.get("room");
     let animationFrameId = null;
+    function startCountdown(){
+
+    }
     function GoToWelcome(){
         if(!inWelcome){
         inWelcome = true;
@@ -98,6 +103,8 @@
         }
     }
     startButton.addEventListener("click", async () => {
+        if(host_ready && guest_ready){
+        
         camera.toBlob((blob) => {
             const newImg = document.createElement('img');
             const url = URL.createObjectURL(blob);
@@ -107,12 +114,21 @@
             if (dataConnection && dataConnection.open) {
             dataConnection.send(blob);
             console.log("photo sent")
+
             }else {
                 console.log("data connection not open, photo not sent")
             }
             
         
         }, "image/jpeg",0.95);
+    } else if(roomID){
+        guest_ready = true;
+        dataConnection.send("guest-ready");
+    } else {
+        host_ready = true;
+        dataConnection.send("host-ready");
+        
+    }
 
     });
     joinButton.addEventListener("click", async () => {
@@ -140,13 +156,20 @@
                 GoToWelcome();
             });
             dataConnection.on("data", (data) => {
-                    
+                if(data instanceof Blob){
                 console.log("Received data from host.");
                 const image = document.createElement("img");
                 const blob = new Blob([data], {type: "image/jpeg"});
 
         image.src = URL.createObjectURL(blob);
         photosDiv.appendChild(image);
+                }
+                if (data == "host-ready"){
+                    host_ready = true;
+                }
+                if(data == "start-countdown"){
+                    startCountdown();
+                }
             });
             mediaCall.on("stream", (remoteStream) => {
                 remotecamera.srcObject = remoteStream;
@@ -230,10 +253,18 @@
                 GoToWelcome();
             });
             connection.on("data", (data) => {
+            if(data instanceof Blob){
             const image = document.createElement("img");
             image.src = URL.createObjectURL(data);
-        photosDiv.appendChild(image);
-
+            photosDiv.appendChild(image);
+            }
+            if(data == "guest-ready"){
+                guest_ready = true
+            }
+            if (host_ready && guest_ready){
+                dataConnection.send("start-countdown") 
+                startCountdown();
+                   }
         });
 
         }); 
