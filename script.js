@@ -75,11 +75,26 @@
         stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
         localcamera.srcObject = stream;
         await localcamera.play();
-        console.log("Camera and microphone access granted.");
+        console.log("Camera access granted.");
 
         drawframe();
+        return true;
         } catch (error) {
-        console.error("Error accessing camera and microphone:", error);
+            switch(error.name){
+                case"NotAllowedError":
+                    ConnectionStatus.textContent = "Camera Access Denied";
+                    break;
+                case"NotFoundError":
+                    ConnectionStatus.textContent = "No Camera Found";
+                     break;
+                case"NotReadableError":
+                    ConnectionStatus.textContent = "Camera Can't Be Accessed";
+                     break;
+                default:
+                    ConnectionStatus.textContent = "Error Occured";
+                     break;
+            }
+            return false;
         }
     }
     startButton.addEventListener("click", async () => {
@@ -101,10 +116,12 @@
 
     });
     joinButton.addEventListener("click", async () => {
+
+    if(await setupCamera()){
         inWelcome = false;
         welcomePage.style.display = "none"
         photobooth.style.display = "flex"
-        await setupCamera();
+        
         peer = new Peer();
         peer.on("open", (id) => {
             console.log("My peer ID is: " + id);
@@ -116,6 +133,10 @@
                 console.log("Data connection established with host.");
             });
             dataConnection.on("close", () =>{
+                GoToWelcome();
+            });
+            dataConnection.on("error", () =>{
+                ConnectionStatus.textContent = "Data Error";
                 GoToWelcome();
             });
             dataConnection.on("data", (data) => {
@@ -131,30 +152,81 @@
                 remotecamera.srcObject = remoteStream;
             });
             mediaCall.on("error", (err) => {
-                console.error("Call error:", err);
+               ConnectionStatus.textContent = "Video Failed ";
+                    GoToWelcome()
             });
         });
+        peer.on("error", (err) => {
+            switch(err.type){
+                case"peer-unavailable":
+                    ConnectionStatus.textContent = "Peer Doesnt Exist";
+               
+                    break;
+                case"network":
+                    ConnectionStatus.textContent = "Lost Connection";
+               
+                     break;
+                case"server-error":
+                    ConnectionStatus.textContent = "Server Error";
+                
+                     break;
+                default:
+                    ConnectionStatus.textContent = "Error Occured";
+                    
+                     break;
+            }
+            GoToWelcome()
+        })
+    }
+    
     });
     createButton.addEventListener("click", async () => {
-        inWelcome =false;
-        await setupCamera();
+    
+    if(await setupCamera()){
         peer = new Peer(); 
-        
+            inWelcome =false;
         peer.on("open", (id) => {
             
+        
              welcomePage.style.display = "none"
             photobooth.style.display = "flex"
             console.log("My peer ID is: " + id);
             invitelink.textContent = `Share this link to invite someone: https://jahyue.github.io/Coloroid/?room=${id}`;
             invitelink.href = `https://jahyue.github.io/Coloroid/?room=${id}`;
         });
+        peer.on("error", (err) => {
+             switch(err.type){
+                case"peer-unavailable":
+                    ConnectionStatus.textContent = "Peer Doesnt Exist";
+          
+                    break;
+                case"network":
+                    ConnectionStatus.textContent = "Lost Connection";
+             
+                     break;
+                case"server-error":
+                    ConnectionStatus.textContent = "Server Error";
+                
+                     break;
+                default:
+                    ConnectionStatus.textContent = "Error Occured";
+                    
+                     break;
+            }
+            GoToWelcome()
+        })
         peer.on("connection", (connection) => {
-            ConnectionStatus.textContent = "Connected";
+            
             dataConnection = connection;
             dataConnection.on("open", () => {
+                ConnectionStatus.textContent = "Connected";
                 console.log("Data connection established with guest.");
             });
             dataConnection.on("close", () =>{
+                GoToWelcome();
+            });
+            dataConnection.on("error", () =>{
+                ConnectionStatus.textContent = "Data Error";
                 GoToWelcome();
             });
             connection.on("data", (data) => {
@@ -172,6 +244,7 @@
         peer.on("call", (call) => {
             mediaCall = call
             mediaCall.on("close", () => {GoToWelcome()});
+           
             console.log("Incoming call from: " + call.peer);
             call.answer(stream);
             call.on("stream", (remoteStream) => {
@@ -179,8 +252,10 @@
 
             });
             call.on("error", (err) => {
-                console.error("Call error:", err);
+                    ConnectionStatus.textContent = "Call Error";
+                    GoToWelcome()
             });
             
         });
+    }
     });
