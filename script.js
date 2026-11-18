@@ -19,6 +19,7 @@
     let animationFrameId = null;
     function GoToWelcome(){
         if(!inWelcome){
+        inWelcome = true;
         welcomePage.style.display = "flex"
         photobooth.style.display = "none"
         if (stream){
@@ -33,7 +34,7 @@
         cancelAnimationFrame(animationFrameId)
         if(dataConnection){dataConnection.close();}
         if(mediaCall){mediaCall.close()}
-        inWelcome = true;
+        
     }
     }
     if (roomID) {
