@@ -204,7 +204,7 @@
     
     });
     createButton.addEventListener("click", async () => {
-    
+    console.log("host clicked", host_ready, guest_ready)
     if(await setupCamera()){
         peer = new Peer(); 
             inWelcome =false;
