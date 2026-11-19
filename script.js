@@ -263,6 +263,7 @@
             }
             if (host_ready && guest_ready){
                 dataConnection.send("start-countdown") 
+                console.log("start")
                 startCountdown();
                    }
         });
