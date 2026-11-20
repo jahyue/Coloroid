@@ -28,6 +28,25 @@ function displayPhoto(blob) {
   image.src = URL.createObjectURL(blob);
   photosDiv.appendChild(image);
 }
+function capturephoto(){
+  camera.toBlob(
+      (blob) => {
+        displayPhoto(blob);
+        if (dataConnection && dataConnection.open) {
+          dataConnection.send(blob);
+          console.log("photo sent");
+        } else {
+          console.log("data connection not open, photo not sent");
+        }
+      },
+      "image/jpeg",
+      0.95,
+    );
+}
+function startPhotoSession(){
+  dataConnection.send("capture-1")
+  capturephoto();
+}
 function handleReceivedData(data) {}
 function handleConnectionError(error) {}
 function updateReady() {
@@ -53,6 +72,9 @@ const timerId = setInterval(() => {
   if (count === 0) {
     count = null;
     clearInterval(timerId);
+    if(!roomID){
+      startPhotoSession();
+    }
     return;
   }
   count--;
@@ -154,7 +176,7 @@ function drawframe() {
   }
   if(count != null){
     ctx.font = "bold 36px Arial";
-    ctx.fillStyle = "#000000";
+    ctx.fillStyle = "#ffffff";
     ctx.fillText(count, 50, 80);
   }
 }
@@ -190,25 +212,7 @@ const setupCamera = async () => {
   }
 };
 startButton.addEventListener("click", async () => {
-  if (host_ready && guest_ready) {
-    camera.toBlob(
-      (blob) => {
-        const newImg = document.createElement("img");
-        const url = URL.createObjectURL(blob);
-
-        newImg.src = url;
-        photosDiv.appendChild(newImg);
-        if (dataConnection && dataConnection.open) {
-          dataConnection.send(blob);
-          console.log("photo sent");
-        } else {
-          console.log("data connection not open, photo not sent");
-        }
-      },
-      "image/jpeg",
-      0.95,
-    );
-  } else if (roomID) {
+  if(roomID) {
     if (guest_ready == false) {
       guest_ready = true;
       dataConnection.send("guest-ready");
@@ -262,6 +266,11 @@ joinButton.addEventListener("click", async () => {
             
           }
         }
+        if (data == "capture-1") {
+          capturephoto();
+        }
+        
+        
       });
       mediaCall.on("stream", (remoteStream) => {
         remotecamera.srcObject = remoteStream;
