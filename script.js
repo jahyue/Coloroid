@@ -21,6 +21,7 @@ const photosDiv = document.getElementById("photos");
 const params = new URLSearchParams(window.location.search);
 const roomID = params.get("room");
 let animationFrameId = null;
+let count = null;
 
 function displayPhoto(blob) {
   const image = document.createElement("img");
@@ -43,7 +44,21 @@ function updateReady() {
   }
   startButton.textContent = `Ready: ${number_ready}/2`;
 }
-function startCountdown() {}
+function startCountdown() {
+  if (count == null){
+    count=3;
+  }
+  
+const timerId = setInterval(() => {
+  if (count === 0) {
+    count = null;
+    clearInterval(timerId);
+    return;
+  }
+  count--;
+  
+}, 1000);
+}
 function GoToWelcome() {
   if (!inWelcome) {
     inWelcome = true;
@@ -136,6 +151,11 @@ function drawframe() {
         camera.height,
       );
     }
+  }
+  if(count != null){
+    ctx.font = "bold 36px Arial";
+    ctx.fillStyle = "#000000";
+    ctx.fillText(count, 50, 80);
   }
 }
 let stream = null;
