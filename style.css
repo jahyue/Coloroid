@@ -1,4 +1,17 @@
 
+#photobooth {
+  display: none;
+}
+
+#localVideo,
+#remoteVideo {
+  display: none;
+}
+
+
+.result-section {
+  display: none;
+}
 * {
   box-sizing: border-box;
   margin: 0;
@@ -18,7 +31,6 @@ body {
   padding: 30px;
 }
 
-/* Welcome */
 
 .welcome-page {
   min-height: 90vh;
@@ -60,7 +72,7 @@ button:hover {
   opacity: 0.85;
 }
 
-/* Photobooth */
+
 
 #photobooth {
   display: none;
