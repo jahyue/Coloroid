@@ -1,30 +1,57 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coloroid</title>
-    <link rel="stylesheet" href="style.css">
-</head>
+
 <body>
-    <video id="localVideo" autoplay playsinline muted></video>
-    <video id="remoteVideo" autoplay playsinline></video>
-    <section id="welcome">
+  <main class="app">
+    <section id="welcome" class="welcome-page">
+      <header class="brand">
         <h1>Coloroid</h1>
+      </header>
+
+      <div class="welcome-actions">
         <button id="createButton">Create Room</button>
         <button id="joinButton">Join Room</button>
+      </div>
     </section>
-    <section id="photobooth">
-    <p id="Status">Waiting....</p>
-    <canvas id="camera" width="640" height="480"></canvas>
-    <canvas id="output" width="640" height="480"></canvas>
-    <div id="photos"></div>
-    <button id="startButton">Ready: 0/2</button>
+
+
+    <section id="photobooth" class="photobooth">
+
+      <header class="booth-header">
+        <h1>Coloroid</h1>
+        <p id="Status">Waiting for connection...</p>
+      </header>
+
+      <div class="booth-content">
+
+
+        <div class="camera-section">
+          <div class="camera-frame">
+            <video id="localVideo" autoplay playsinline muted></video>
+            <video id="remoteVideo" autoplay playsinline></video>
+            <canvas id="camera" width="640" height="480"></canvas>
+          </div>
+
+          <button id="startButton">Ready: 0/2</button>
+
+          <a id="invitelink" href="#">
+            Waiting for invite...
+          </a>
+        </div>
+
+        <aside class="photos-section">
+          <h2>Your Photos</h2>
+          <div id="photos"></div>
+        </aside>
+
+      </div>
+
+      <section class="result-section">
+        <canvas id="output" width="640" height="1440"></canvas>
+      </section>
+
     </section>
-    
-    
-    <a id="invitelink" href="#" >Waiting for invite...</a>
-    <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
-    <script src="script.js"></script>
+
+  </main>
+
+  <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+  <script src="script.js"></script>
 </body>
-</html>

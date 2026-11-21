@@ -1,3 +1,128 @@
-#photobooth, #remoteVideo , #localVideo{
-    display: none;
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #211D2B;
+  color: #F7D6A5;
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+}
+
+.app {
+  width: 100%;
+  min-height: 100vh;
+  padding: 30px;
+}
+
+/* Welcome */
+
+.welcome-page {
+  min-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 35px;
+  text-align: center;
+}
+
+.brand h1 {
+  font-size: 3rem;
+  letter-spacing: 4px;
+}
+
+.brand p {
+  margin-top: 10px;
+  color: #D8C5C0;
+}
+
+.welcome-actions {
+  display: flex;
+  gap: 15px;
+}
+
+button {
+  border: none;
+  border-radius: 12px;
+  padding: 14px 25px;
+  background: #F27D72;
+  color: #211D2B;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.85;
+}
+
+/* Photobooth */
+
+#photobooth {
+  display: none;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.booth-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.booth-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 25px;
+}
+
+.camera-section,
+.photos-section {
+  background: #302A3A;
+  padding: 20px;
+  border-radius: 16px;
+}
+
+.camera-frame {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #000;
+}
+
+#camera {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.photos-section img {
+  width: 100%;
+  margin-top: 12px;
+  border: 6px solid #F7D6A5;
+  border-radius: 4px;
+}
+
+#output {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 700px) {
+  .booth-content {
+    grid-template-columns: 1fr;
+  }
+
+  .welcome-actions {
+    flex-direction: column;
+  }
+
+  .booth-header {
+    flex-direction: column;
+    gap: 10px;
+  }
 }
