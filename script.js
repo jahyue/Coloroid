@@ -9,6 +9,7 @@ let host_ready = false;
 let guest_ready = false;
 let number_ready = 0;
 let countdownStarted = false;
+let targetTime = null;
 let ConnectionStatus = document.getElementById("Status");
 const welcomePage = document.getElementById("welcome");
 const photobooth = document.getElementById("photobooth");
@@ -54,22 +55,23 @@ function updateReady() {
   if (number_ready == 2) {
     if (!roomID) {
       if (!countdownStarted) {
-        dataConnection.send("start-countdown");
+        targetTime = Date.now() + 3000;
+        dataConnection.send({timestamp: targetTime, type:"start-countdown"});
         countdownStarted = true;
-        startCountdown();
+        startCountdown(targetTime);
         
       }
     }
   }
   startButton.textContent = `Ready: ${number_ready}/2`;
 }
-function startCountdown() {
+function startCountdown(timestamp) {
   if (count == null){
-    count=3;
+    count= Math.ceil((timestamp - Date.now())/ 1000);
   }
   
 const timerId = setInterval(() => {
-  if (count === 0) {
+  if (Date.now() >= timestamp) {
     count = null;
     clearInterval(timerId);
     if(!roomID){
@@ -77,7 +79,7 @@ const timerId = setInterval(() => {
     }
     return;
   }
-  count--;
+  count= Math.ceil((timestamp - Date.now())/ 1000);
   
 }, 1000);
 }
@@ -174,7 +176,7 @@ function drawframe() {
       );
     }
   }
-  if(count != null){
+  if(count != null && count != 0){
     ctx.font = "bold 36px Arial";
     ctx.fillStyle = "#ffffff";
     ctx.fillText(count, 50, 80);
@@ -259,10 +261,10 @@ joinButton.addEventListener("click", async () => {
           host_ready = true;
           updateReady();
         }
-        if (data == "start-countdown") {
+        if (data.type == "start-countdown") {
           if (!countdownStarted) {
             countdownStarted = true;
-            startCountdown();
+            startCountdown(data.timestamp);
             
           }
         }
