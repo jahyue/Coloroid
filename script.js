@@ -10,6 +10,7 @@ let guest_ready = false;
 let number_ready = 0;
 let countdownStarted = false;
 let targetTime = null;
+let photocount = 0;
 let ConnectionStatus = document.getElementById("Status");
 const welcomePage = document.getElementById("welcome");
 const photobooth = document.getElementById("photobooth");
@@ -29,24 +30,33 @@ function displayPhoto(blob) {
   image.src = URL.createObjectURL(blob);
   photosDiv.appendChild(image);
 }
-function capturephoto(){
+function capturephoto() {
   camera.toBlob(
-      (blob) => {
-        displayPhoto(blob);
-        if (dataConnection && dataConnection.open) {
-          dataConnection.send(blob);
-          console.log("photo sent");
-        } else {
-          console.log("data connection not open, photo not sent");
-        }
-      },
-      "image/jpeg",
-      0.95,
-    );
+    (blob) => {
+      displayPhoto(blob);
+      if (dataConnection && dataConnection.open) {
+        dataConnection.send(blob);
+        console.log("photo sent");
+      } else {
+        console.log("data connection not open, photo not sent");
+      }
+    },
+    "image/jpeg",
+    0.95,
+  );
 }
-function startPhotoSession(){
-  dataConnection.send("capture-1")
-  capturephoto();
+function startPhotoSession() {
+  if (photocount < 3) {
+    photocount++;
+    dataConnection.send(`capture-${photocount}`);
+    capturephoto();
+    if (photocount !== 3) {
+      targetTime = Date.now() + 3000;
+      dataConnection.send({ timestamp: targetTime, type: "start-countdown" });
+      countdownStarted = true;
+      startCountdown(targetTime);
+    }
+  }
 }
 function handleReceivedData(data) {}
 function handleConnectionError(error) {}
@@ -56,32 +66,31 @@ function updateReady() {
     if (!roomID) {
       if (!countdownStarted) {
         targetTime = Date.now() + 3000;
-        dataConnection.send({timestamp: targetTime, type:"start-countdown"});
+        dataConnection.send({ timestamp: targetTime, type: "start-countdown" });
         countdownStarted = true;
         startCountdown(targetTime);
-        
       }
     }
   }
   startButton.textContent = `Ready: ${number_ready}/2`;
 }
 function startCountdown(timestamp) {
-  if (count == null){
-    count= Math.ceil((timestamp - Date.now())/ 1000);
+  if (count == null) {
+    count = Math.ceil((timestamp - Date.now()) / 1000);
   }
-  
-const timerId = setInterval(() => {
-  if (Date.now() >= timestamp) {
-    count = null;
-    clearInterval(timerId);
-    if(!roomID){
-      startPhotoSession();
+
+  const timerId = setInterval(() => {
+    if (Date.now() >= timestamp) {
+      count = null;
+      clearInterval(timerId);
+      countdownStarted = false;
+      if (!roomID) {
+        startPhotoSession();
+      }
+      return;
     }
-    return;
-  }
-  count= Math.ceil((timestamp - Date.now())/ 1000);
-  
-}, 1000);
+    count = Math.ceil((timestamp - Date.now()) / 1000);
+  }, 1000);
 }
 function GoToWelcome() {
   if (!inWelcome) {
@@ -176,10 +185,10 @@ function drawframe() {
       );
     }
   }
-  if(count != null && count != 0){
+  if (count != null && count != 0) {
     ctx.font = "bold 36px Arial";
-    ctx.fillStyle = "#ffffff";
-    ctx.fillText(count, 50, 80);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText(count, 50, 80);
   }
 }
 let stream = null;
@@ -214,7 +223,7 @@ const setupCamera = async () => {
   }
 };
 startButton.addEventListener("click", async () => {
-  if(roomID) {
+  if (roomID) {
     if (guest_ready == false) {
       guest_ready = true;
       dataConnection.send("guest-ready");
@@ -261,18 +270,19 @@ joinButton.addEventListener("click", async () => {
           host_ready = true;
           updateReady();
         }
-        if (data.type == "start-countdown") {
-          if (!countdownStarted) {
-            countdownStarted = true;
-            startCountdown(data.timestamp);
-            
+        if (typeof data == "object") {
+          if (data.type == "start-countdown") {
+            if (!countdownStarted) {
+              countdownStarted = true;
+              startCountdown(data.timestamp);
+            }
           }
         }
-        if (data == "capture-1") {
-          capturephoto();
+        if (typeof data == "string") {
+          if (data.startsWith("capture-")) {
+            capturephoto();
+          }
         }
-        
-        
       });
       mediaCall.on("stream", (remoteStream) => {
         remotecamera.srcObject = remoteStream;
