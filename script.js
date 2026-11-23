@@ -11,6 +11,8 @@ let number_ready = 0;
 let countdownStarted = false;
 let targetTime = null;
 let photocount = 0;
+let output = document.getElementById("output");
+let outputctx = output.getContext("2d")
 let ConnectionStatus = document.getElementById("Status");
 const welcomePage = document.getElementById("welcome");
 const photobooth = document.getElementById("photobooth");
@@ -24,7 +26,11 @@ const params = new URLSearchParams(window.location.search);
 const roomID = params.get("room");
 let animationFrameId = null;
 let count = null;
-
+function drawPhotostrip(){
+  if(photosDiv.children.length == 3){
+    
+  }
+}
 function displayPhoto(blob) {
   const image = document.createElement("img");
   image.src = URL.createObjectURL(blob);
@@ -55,6 +61,8 @@ function startPhotoSession() {
       dataConnection.send({ timestamp: targetTime, type: "start-countdown" });
       countdownStarted = true;
       startCountdown(targetTime);
+    }else {
+      drawPhotostrip();
     }
   }
 }
