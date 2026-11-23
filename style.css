@@ -8,10 +8,10 @@
   display: none;
 }
 
-
 .result-section {
   display: none;
 }
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -19,9 +19,6 @@
 }
 
 body {
-  background: #211D2B;
-  color: #F7D6A5;
-  font-family: Arial, sans-serif;
   min-height: 100vh;
 }
 
@@ -30,7 +27,6 @@ body {
   min-height: 100vh;
   padding: 30px;
 }
-
 
 .welcome-page {
   min-height: 90vh;
@@ -49,7 +45,6 @@ body {
 
 .brand p {
   margin-top: 10px;
-  color: #D8C5C0;
 }
 
 .welcome-actions {
@@ -58,18 +53,10 @@ body {
 }
 
 button {
-  border: none;
-  border-radius: 12px;
   padding: 14px 25px;
-  background: #F27D72;
-  color: #211D2B;
   font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
-}
-
-button:hover {
-  opacity: 0.85;
 }
 
 #photobooth {
@@ -92,16 +79,12 @@ button:hover {
 
 .camera-section,
 .photos-section {
-  background: #302A3A;
   padding: 20px;
-  border-radius: 16px;
 }
 
 .camera-frame {
   width: 100%;
   overflow: hidden;
-  border-radius: 12px;
-  background: #000;
 }
 
 #camera {
@@ -113,8 +96,6 @@ button:hover {
 .photos-section img {
   width: 100%;
   margin-top: 12px;
-  border: 6px solid #F7D6A5;
-  border-radius: 4px;
 }
 
 #output {
