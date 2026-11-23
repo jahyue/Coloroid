@@ -72,8 +72,6 @@ button:hover {
   opacity: 0.85;
 }
 
-
-
 #photobooth {
   display: none;
   flex-direction: column;
