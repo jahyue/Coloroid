@@ -24,17 +24,27 @@ const ctx = camera.getContext("2d");
 const photosDiv = document.getElementById("photos");
 const params = new URLSearchParams(window.location.search);
 const roomID = params.get("room");
+const result = document.querySelector(".result-section")
 let animationFrameId = null;
 let count = null;
 function drawPhotostrip(){
-  if(photosDiv.children.length == 3){
-    
+  if(photosDiv.children.length == 3 && Array.from(photosDiv.children).every((photo) => photo.complete && photo.naturalWidth > 0)){
+    outputctx.clearRect(0, 0, output.width, output.height)
+    for(let i = 0; i  < 3; i++){
+      
+      outputctx.drawImage(photosDiv.children[i], 0, i*480);
+    }
+    photobooth.style.display = "none";
+    result.style.display = "flex";
   }
 }
 function displayPhoto(blob) {
   const image = document.createElement("img");
   image.src = URL.createObjectURL(blob);
   photosDiv.appendChild(image);
+  image.onload = () => {
+  drawPhotostrip();
+};
 }
 function capturephoto() {
   camera.toBlob(
@@ -54,15 +64,13 @@ function capturephoto() {
 function startPhotoSession() {
   if (photocount < 3) {
     photocount++;
-    dataConnection.send(`capture-${photocount}`);
+
     capturephoto();
     if (photocount !== 3) {
       targetTime = Date.now() + 3000;
       dataConnection.send({ timestamp: targetTime, type: "start-countdown" });
       countdownStarted = true;
       startCountdown(targetTime);
-    }else {
-      drawPhotostrip();
     }
   }
 }
@@ -286,11 +294,6 @@ joinButton.addEventListener("click", async () => {
             }
           }
         }
-        if (typeof data == "string") {
-          if (data.startsWith("capture-")) {
-            capturephoto();
-          }
-        }
       });
       mediaCall.on("stream", (remoteStream) => {
         remotecamera.srcObject = remoteStream;
@@ -370,9 +373,7 @@ createButton.addEventListener("click", async () => {
         GoToWelcome();
       });
       connection.on("data", (data) => {
-        if (data instanceof Blob) {
-          displayPhoto(data);
-        }
+
         if (data == "guest-ready") {
           guest_ready = true;
           updateReady();
