@@ -83,8 +83,42 @@ button {
 }
 
 .camera-frame {
+  position: relative;
   width: 100%;
   overflow: hidden;
+}
+#countdownDisplay{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: large;
+  z-index: 1;
+  color: white;
+  pointer-events: none;
+}
+
+@keyframes cameraFlash {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+#flash.active {
+  animation: cameraFlash 300ms ease-out;
+}
+#flash{
+  position: absolute;
+inset: 0 ;
+background: white;
+opacity: 0;
+pointer-events: none;
 }
 
 #camera {

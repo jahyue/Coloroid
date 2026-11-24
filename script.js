@@ -25,8 +25,15 @@ const photosDiv = document.getElementById("photos");
 const params = new URLSearchParams(window.location.search);
 const roomID = params.get("room");
 const result = document.querySelector(".result-section")
+    const countdown = document.querySelector("#countdownDisplay");
+        const flash = document.querySelector("#flash");
 let animationFrameId = null;
 let count = null;
+function triggerFlash(){
+  flash.classList.remove('active');
+  void flash.offsetWidth;
+  flash.classList.add('active');
+}
 function drawPhotostrip(){
   if(photosDiv.children.length == 3 && Array.from(photosDiv.children).every((photo) => photo.complete && photo.naturalWidth > 0)){
     outputctx.clearRect(0, 0, output.width, output.height)
@@ -47,6 +54,8 @@ function displayPhoto(blob) {
 };
 }
 function capturephoto() {
+  triggerFlash();
+  dataConnection.send("flash");
   camera.toBlob(
     (blob) => {
       displayPhoto(blob);
@@ -201,11 +210,14 @@ function drawframe() {
       );
     }
   }
-  if (count != null && count != 0) {
-    ctx.font = "bold 36px Arial";
-    ctx.fillStyle = "#ffffff";
-    ctx.fillText(count, 50, 80);
-  }
+ 
+
+    if(count){
+    countdown.textContent = count;
+    }else{
+          countdown.textContent ="";
+    }
+  
 }
 let stream = null;
 const setupCamera = async () => {
@@ -279,16 +291,17 @@ joinButton.addEventListener("click", async () => {
         GoToWelcome();
       });
       dataConnection.on("data", (data) => {
-        console.log("Received data:", data);
-console.log("Type:", typeof data);
-console.log("Constructor:", data?.constructor?.name);
-console.log("Is Blob:", data instanceof Blob);
-        if (data instanceof Blob) {
+       
+        if (data instanceof Uint8Array) {
+          data = new Blob([data], { type: "image/jpeg" })
           displayPhoto(data);
         }
         if (data == "host-ready") {
           host_ready = true;
           updateReady();
+        }
+        if (data == "flash") {
+          triggerFlash();
         }
         if (typeof data == "object") {
           if (data.type == "start-countdown") {
