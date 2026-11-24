@@ -279,6 +279,10 @@ joinButton.addEventListener("click", async () => {
         GoToWelcome();
       });
       dataConnection.on("data", (data) => {
+        console.log("Received data:", data);
+console.log("Type:", typeof data);
+console.log("Constructor:", data?.constructor?.name);
+console.log("Is Blob:", data instanceof Blob);
         if (data instanceof Blob) {
           displayPhoto(data);
         }
