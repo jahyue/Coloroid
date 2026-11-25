@@ -12,7 +12,7 @@ let countdownStarted = false;
 let targetTime = null;
 let photocount = 0;
 let output = document.getElementById("output");
-let outputctx = output.getContext("2d")
+let outputctx = output.getContext("2d");
 let ConnectionStatus = document.getElementById("Status");
 const welcomePage = document.getElementById("welcome");
 const photobooth = document.getElementById("photobooth");
@@ -24,22 +24,44 @@ const ctx = camera.getContext("2d");
 const photosDiv = document.getElementById("photos");
 const params = new URLSearchParams(window.location.search);
 const roomID = params.get("room");
-const result = document.querySelector(".result-section")
-    const countdown = document.querySelector("#countdownDisplay");
-        const flash = document.querySelector("#flash");
+const result = document.querySelector(".result-section");
+const countdown = document.querySelector("#countdownDisplay");
+const flash = document.querySelector("#flash");
 let animationFrameId = null;
 let count = null;
-function triggerFlash(){
-  flash.classList.remove('active');
-  void flash.offsetWidth;
-  flash.classList.add('active');
+let timerId = null;
+function reset() {
+  photocount = 0;
+  photosDiv.replaceChildren();
+  host_ready = false;
+  guest_ready = false;
+  number_ready = 0;
+  result.style.display = "none";
+  photobooth.style.display = "flex";
+  startButton.textContent = `Ready: 0/2`;
+  outputctx.clearRect(0, 0, output.width, output.height);
+  countdownStarted = false;
+  count = null;
+  targetTime = null;
+    clearInterval(timerId);
+  timerId = null;
+
 }
-function drawPhotostrip(){
-  if(photosDiv.children.length == 3 && Array.from(photosDiv.children).every((photo) => photo.complete && photo.naturalWidth > 0)){
-    outputctx.clearRect(0, 0, output.width, output.height)
-    for(let i = 0; i  < 3; i++){
-      
-      outputctx.drawImage(photosDiv.children[i], 0, i*480);
+function triggerFlash() {
+  flash.classList.remove("active");
+  void flash.offsetWidth;
+  flash.classList.add("active");
+}
+function drawPhotostrip() {
+  if (
+    photosDiv.children.length == 3 &&
+    Array.from(photosDiv.children).every(
+      (photo) => photo.complete && photo.naturalWidth > 0,
+    )
+  ) {
+    outputctx.clearRect(0, 0, output.width, output.height);
+    for (let i = 0; i < 3; i++) {
+      outputctx.drawImage(photosDiv.children[i], 0, i * 480);
     }
     photobooth.style.display = "none";
     result.style.display = "flex";
@@ -50,8 +72,8 @@ function displayPhoto(blob) {
   image.src = URL.createObjectURL(blob);
   photosDiv.appendChild(image);
   image.onload = () => {
-  drawPhotostrip();
-};
+    drawPhotostrip();
+  };
 }
 function capturephoto() {
   triggerFlash();
@@ -104,16 +126,18 @@ function startCountdown(timestamp) {
     count = Math.ceil((timestamp - Date.now()) / 1000);
   }
 
-  const timerId = setInterval(() => {
+  timerId = setInterval(() => {
     if (Date.now() >= timestamp) {
       count = null;
       clearInterval(timerId);
+      timerId = null
       countdownStarted = false;
       if (!roomID) {
         startPhotoSession();
       }
       return;
     }
+
     count = Math.ceil((timestamp - Date.now()) / 1000);
   }, 1000);
 }
@@ -210,14 +234,12 @@ function drawframe() {
       );
     }
   }
- 
 
-    if(count){
+  if (count) {
     countdown.textContent = count;
-    }else{
-          countdown.textContent ="";
-    }
-  
+  } else {
+    countdown.textContent = "";
+  }
 }
 let stream = null;
 const setupCamera = async () => {
@@ -291,14 +313,16 @@ joinButton.addEventListener("click", async () => {
         GoToWelcome();
       });
       dataConnection.on("data", (data) => {
-       
         if (data instanceof Uint8Array) {
-          data = new Blob([data], { type: "image/jpeg" })
+          data = new Blob([data], { type: "image/jpeg" });
           displayPhoto(data);
         }
         if (data == "host-ready") {
           host_ready = true;
           updateReady();
+        }
+        if (data == "retake") {
+          reset();
         }
         if (data == "flash") {
           triggerFlash();
@@ -390,10 +414,11 @@ createButton.addEventListener("click", async () => {
         GoToWelcome();
       });
       connection.on("data", (data) => {
-
         if (data == "guest-ready") {
           guest_ready = true;
           updateReady();
+        } else if (data == "retake") {
+          reset();
         }
       });
     });
@@ -415,4 +440,24 @@ createButton.addEventListener("click", async () => {
       });
     });
   }
+});
+document.querySelector("#retake").addEventListener("click", async () => {
+  dataConnection.send("retake");
+  reset();
+});
+document.getElementById('download').addEventListener('click', () => {
+  const image = document.getElementById('output');
+  const link = document.createElement('a');
+  
+  image.toBlob((blob) => {
+  if (!blob) return;
+  const url = URL.createObjectURL(blob);
+    link.href = url;
+  link.download = 'downloaded-photo.png';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url)
+}, "image/png");
+
 });
