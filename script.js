@@ -43,9 +43,8 @@ function reset() {
   countdownStarted = false;
   count = null;
   targetTime = null;
-    clearInterval(timerId);
+  clearInterval(timerId);
   timerId = null;
-
 }
 function triggerFlash() {
   flash.classList.remove("active");
@@ -60,9 +59,16 @@ function drawPhotostrip() {
     )
   ) {
     outputctx.clearRect(0, 0, output.width, output.height);
+
+    outputctx.fillStyle = "white";
+    outputctx.fillRect(0, 0, output.width, output.height);
     for (let i = 0; i < 3; i++) {
-      outputctx.drawImage(photosDiv.children[i], 0, i * 480);
+      outputctx.drawImage(photosDiv.children[i], 40, i * 504 + 40);
     }
+    outputctx.font = "36px sans-serif";
+    outputctx.fillStyle = "#111827";
+    outputctx.textAlign = "center";
+    outputctx.fillText("COLOROiD", 360, 1590);
     photobooth.style.display = "none";
     result.style.display = "flex";
   }
@@ -105,8 +111,6 @@ function startPhotoSession() {
     }
   }
 }
-function handleReceivedData(data) {}
-function handleConnectionError(error) {}
 function updateReady() {
   number_ready = guest_ready + host_ready;
   if (number_ready == 2) {
@@ -130,7 +134,7 @@ function startCountdown(timestamp) {
     if (Date.now() >= timestamp) {
       count = null;
       clearInterval(timerId);
-      timerId = null
+      timerId = null;
       countdownStarted = false;
       if (!roomID) {
         startPhotoSession();
@@ -445,19 +449,18 @@ document.querySelector("#retake").addEventListener("click", async () => {
   dataConnection.send("retake");
   reset();
 });
-document.getElementById('download').addEventListener('click', () => {
-  const image = document.getElementById('output');
-  const link = document.createElement('a');
-  
-  image.toBlob((blob) => {
-  if (!blob) return;
-  const url = URL.createObjectURL(blob);
-    link.href = url;
-  link.download = 'downloaded-photo.png';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url)
-}, "image/png");
+document.getElementById("download").addEventListener("click", () => {
+  const image = document.getElementById("output");
+  const link = document.createElement("a");
 
+  image.toBlob((blob) => {
+    if (!blob) return;
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.download = "downloaded-photo.png";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }, "image/png");
 });
