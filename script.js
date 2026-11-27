@@ -60,15 +60,15 @@ function drawPhotostrip() {
   ) {
     outputctx.clearRect(0, 0, output.width, output.height);
 
-    outputctx.fillStyle = "white";
+    outputctx.fillStyle = "#C8B6E8";
     outputctx.fillRect(0, 0, output.width, output.height);
     for (let i = 0; i < 3; i++) {
       outputctx.drawImage(photosDiv.children[i], 40, i * 504 + 40);
     }
-    outputctx.font = "36px sans-serif";
-    outputctx.fillStyle = "#111827";
+    outputctx.font = "36px fredoka 600";
+    outputctx.fillStyle = "#493B50";
     outputctx.textAlign = "center";
-    outputctx.fillText("COLOROiD", 360, 1590);
+    outputctx.fillText("COLOROID", 360, 1590);
     photobooth.style.display = "none";
     result.style.display = "flex";
   }

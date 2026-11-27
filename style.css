@@ -1,4 +1,3 @@
-
 #photobooth {
   display: none;
 }
@@ -10,8 +9,22 @@
 
 .result-section {
   display: none;
+  flex-direction: column;
+  width: 100%;
+  gap: 20px;
+
+
+  height: auto;
+  align-items: center;
 }
 
+.result-buttons {
+  width: 100%;
+  display: flex;
+gap: 15px; 
+margin-top: 20px;
+  justify-content: center;
+}
 * {
   box-sizing: border-box;
   margin: 0;
@@ -19,6 +32,7 @@
 }
 
 body {
+  font-family: "Quicksand", sans-serif;
   min-height: 100vh;
 }
 
@@ -39,6 +53,7 @@ body {
 }
 
 .brand h1 {
+  font-family: "Fredoka", sans-serif;
   font-size: 3rem;
   letter-spacing: 4px;
 }
@@ -53,9 +68,11 @@ body {
 }
 
 button {
+  font-family: "Quicksand", sans-serif;
+  font-weight: bold;
   padding: 14px 25px;
   font-size: 1rem;
-  font-weight: bold;
+
   cursor: pointer;
 }
 
@@ -66,6 +83,7 @@ button {
 }
 
 .booth-header {
+  font-family: "Fredoka", sans-serif;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -79,6 +97,7 @@ button {
 
 .camera-section,
 .photos-section {
+  font-family: "Quicksand", sans-serif;
   padding: 20px;
 }
 
@@ -87,12 +106,14 @@ button {
   width: 100%;
   overflow: hidden;
 }
-#countdownDisplay{
+#countdownDisplay {
+  font-family: "Fredoka", sans-serif;
+  font-weight: bold;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: large;
+  font-size: xx-large;
   z-index: 1;
   color: white;
   pointer-events: none;
@@ -113,12 +134,12 @@ button {
 #flash.active {
   animation: cameraFlash 300ms ease-out;
 }
-#flash{
+#flash {
   position: absolute;
-inset: 0 ;
-background: white;
-opacity: 0;
-pointer-events: none;
+  inset: 0;
+  background: white;
+  opacity: 0;
+  pointer-events: none;
 }
 
 #camera {
@@ -133,7 +154,8 @@ pointer-events: none;
 }
 
 #output {
-  max-width: 100%;
+
+  max-width: 360px;
   height: auto;
 }
 
