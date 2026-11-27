@@ -91,6 +91,10 @@ button {
   background-color:#F4A6A6;
   cursor: pointer;
 }
+button:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
 #joinButton{
   background-color: #C8B6E8;
 }
