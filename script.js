@@ -65,7 +65,7 @@ function drawPhotostrip() {
     for (let i = 0; i < 3; i++) {
       outputctx.drawImage(photosDiv.children[i], 40, i * 504 + 40);
     }
-    outputctx.font = "36px fredoka 600";
+    outputctx.font = "600 36px fredoka";
     outputctx.fillStyle = "#493B50";
     outputctx.textAlign = "center";
     outputctx.fillText("COLOROID", 360, 1590);
@@ -306,6 +306,7 @@ joinButton.addEventListener("click", async () => {
       });
       dataConnection = peer.connect(roomID);
       dataConnection.on("open", () => {
+                invitelink.textContent = ` `;
         ConnectionStatus.textContent = "Connected";
         console.log("Data connection established with host.");
       });
@@ -407,6 +408,7 @@ createButton.addEventListener("click", async () => {
     peer.on("connection", (connection) => {
       dataConnection = connection;
       dataConnection.on("open", () => {
+        invitelink.textContent = ` `;
         ConnectionStatus.textContent = "Connected";
         console.log("Data connection established with guest.");
       });
